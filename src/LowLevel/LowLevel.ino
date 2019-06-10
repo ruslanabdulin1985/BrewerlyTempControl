@@ -11,6 +11,9 @@
 #define DC   9
 #define RESET  8  
 
+#define RELAY1 6
+#define RELAY2 7
+
 
 
 
@@ -19,10 +22,6 @@ TFT myScreen = TFT(CS, DC, RESET);
 
 // variable to keep track of the elapsed time
 int counter = 0;
-// char array to print time
-
-//char printoutTest[5];
-
 
 double temp;
 String tempString;
@@ -75,28 +74,67 @@ void drawRightTank(){
   myScreen.text("C",115,60);
 }
 
-void SetTemperature(String tank, String text){
+
+void SetTemperatureL(String text){
 
   char printout[4];
 
   text.toCharArray(printout,5);
   
   myScreen.setTextSize(2);
-  if (tank == "left"){
-      myScreen.stroke(0,0,0);
-      myScreen.fill(0,0,0);
-      myScreen.rect(20,30,50,20);
-      myScreen.stroke(0,191,255);
-      myScreen.text(printout,20,30);
-  }
-  if (tank == "right"){
-      myScreen.stroke(0,0,25);
-      myScreen.fill(0,0,25);
-      myScreen.rect(100,30,50,20);
-      myScreen.stroke(0,191,255);
-      myScreen.text(printout,100,30);
-  }
+
+  text.toCharArray(printout,5);
+  myScreen.stroke(0,0,0);
+  myScreen.fill(0,0,0);
+  myScreen.rect(20,30,50,20);
+  myScreen.stroke(0,191,255);
+  myScreen.text(printout,20,30);
+  
+
 }
+
+void SetTemperatureR(String text){
+
+  char printout[4];
+
+  text.toCharArray(printout,5);
+  
+  myScreen.setTextSize(2);
+ 
+  myScreen.stroke(0,0,0);
+  myScreen.fill(0,0,0);
+  myScreen.rect(100,30,50,20);
+  myScreen.stroke(0,191,255);
+  myScreen.text(printout,100,30);
+
+}
+
+void setRellayL(boolean pos){
+  if (pos){
+    myScreen.stroke(0,128,0);
+    myScreen.fill(0,128,0);
+    digitalWrite(RELAY1, 1);
+  }
+  else{
+    myScreen.stroke(255,0,0);
+    myScreen.fill(255,0,0);
+    digitalWrite(RELAY1, 0);
+  }
+  myScreen.circle(40, 100, 5);
+}
+
+void setRellayR(boolean pos){
+    if (pos){
+    myScreen.stroke(0,128,0);
+    myScreen.fill(0,128,0);
+  }
+  else{
+    myScreen.stroke(255,0,0);
+    myScreen.fill(255,0,0);
+  }
+  myScreen.circle(122, 100, 5);
+}
+
 
 double getTemperature(){
   sensors.requestTemperatures(); // Send the command to get temperatures
@@ -105,6 +143,9 @@ double getTemperature(){
 }
 
 void setup() {
+
+pinMode(RELAY1, OUTPUT);
+pinMode(RELAY2, OUTPUT);
 
 sensors.begin();
 temp = -99;
@@ -134,14 +175,19 @@ drawRightTank();
 void loop() { 
   double temp = getTemperature();
   
-  
+  if (temp > 20)
+    setRellayL(true);
+
+  if (temp > 20)
+    setRellayR(false); 
   
   if (!tempString.equals(String(temp,5))){
       tempString = String(temp,5);
-      SetTemperature("left", tempString);
+      SetTemperatureL(tempString);
+      SetTemperatureR(tempString);
     }
-
-
+  
+//  SetTemperature("right", "test");
   delay(1000);  // pause 
   
 }
