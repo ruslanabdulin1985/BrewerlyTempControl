@@ -20,7 +20,7 @@ TFT myScreen = TFT(CS, DC, RESET);
 // variable to keep track of the elapsed time
 int counter = 0;
 // char array to print time
-char printout[4];
+
 //char printoutTest[5];
 
 
@@ -52,6 +52,7 @@ void drawLeftTank(){
   myScreen.line(70, 3, 8, 3);
   myScreen.line(8, 3, 1, 15);
 
+  myScreen.setTextSize(1);
   myScreen.text("o",25,60);
   myScreen.setTextSize(3);
   myScreen.text("C",35,60);
@@ -67,13 +68,18 @@ void drawRightTank(){
   myScreen.line(158, 15, 150, 3);
   myScreen.line(150, 3, 90, 3);
   myScreen.line(90, 3, 83, 15);
-  
+
+  myScreen.setTextSize(1);
   myScreen.text("o",105,60);
   myScreen.setTextSize(3);
   myScreen.text("C",115,60);
 }
 
-void SetTemperature(String tank, char text){
+void SetTemperature(String tank, String text){
+
+  char printout[4];
+
+  text.toCharArray(printout,5);
   
   myScreen.setTextSize(2);
   if (tank == "left"){
@@ -81,14 +87,14 @@ void SetTemperature(String tank, char text){
       myScreen.fill(0,0,0);
       myScreen.rect(20,30,50,20);
       myScreen.stroke(0,191,255);
-      myScreen.text(text,20,30);
+      myScreen.text(printout,20,30);
   }
   if (tank == "right"){
       myScreen.stroke(0,0,25);
       myScreen.fill(0,0,25);
       myScreen.rect(100,30,50,20);
       myScreen.stroke(0,191,255);
-      myScreen.text(text,100,30);
+      myScreen.text(printout,100,30);
   }
 }
 
@@ -104,19 +110,19 @@ sensors.begin();
 temp = -99;
 
   // put your setup code here, to run once:
- myScreen.begin();  
+myScreen.begin();  
 
 clearScreen();
 
-//drawLeftTank();
+drawLeftTank();
 //
-//drawRightTank();
+drawRightTank();
  
 // Predefined text
 
   
-  myScreen.stroke(0,191,255);
-  myScreen.text("DS18b20 : ",10,120);
+//  myScreen.stroke(0,191,255);
+//  myScreen.text("DS18b20 : ",10,120);
 
 
 //  delay(1000);  // pause for dramatic effect
@@ -126,21 +132,16 @@ clearScreen();
 }
 
 void loop() { 
-//  double temp = getTemperature();
+  double temp = getTemperature();
   
   
   
-//  if (!tempString.equals(String(temp,5))){
-//      tempString = String(temp,5);
-//      tempString.toCharArray(printout,5);
-////      SetTemperature(myScreen, "left", printout);
-//    }
+  if (!tempString.equals(String(temp,5))){
+      tempString = String(temp,5);
+      SetTemperature("left", tempString);
+    }
 
-  Serial.println("Test");
-  
 
-  delay(1000);  // pause for dramatic effect
+  delay(1000);  // pause 
   
-  // put your main code here, to run repeatedly:
-
 }
