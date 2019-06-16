@@ -15,7 +15,9 @@
 #define RELAY2 7
 
 
+double tankLRelayTemp = 99.0;
 
+double tankRRelayTemp = 99.0;
 
 
 TFT myScreen = TFT(CS, DC, RESET);
@@ -75,9 +77,12 @@ void drawRightTank(){
 }
 
 
+
+
 void SetTemperatureL(String text){
 
   char printout[4];
+  
 
   text.toCharArray(printout,5);
   
@@ -120,20 +125,50 @@ void setRellayL(boolean pos){
     myScreen.fill(255,0,0);
     digitalWrite(RELAY1, 0);
   }
-  myScreen.circle(40, 100, 5);
+  myScreen.circle(20, 100, 5);
 }
 
 void setRellayR(boolean pos){
     if (pos){
     myScreen.stroke(0,128,0);
     myScreen.fill(0,128,0);
+    digitalWrite(RELAY2, 1);
   }
   else{
     myScreen.stroke(255,0,0);
     myScreen.fill(255,0,0);
+    digitalWrite(RELAY2, 0);
   }
-  myScreen.circle(122, 100, 5);
+  myScreen.circle(100, 100, 5);
+
+ 
+
+  
 }
+
+void updtaeRelayTempL(){
+  char RrelayTempPrintout[5];
+  String(tankLRelayTemp,5).toCharArray(RrelayTempPrintout,5);
+  myScreen.stroke(0,0,0);
+  myScreen.fill(0,0,0);
+  myScreen.setTextSize(1);
+  myScreen.rect(30,98,30,10);
+  myScreen.stroke(0,191,255);
+  myScreen.text(RrelayTempPrintout,30,98);
+}
+
+void updtaeRelayTempR(){
+  char RrelayTempPrintout[5];
+  String(tankRRelayTemp,5).toCharArray(RrelayTempPrintout,5);
+  myScreen.stroke(0,0,0);
+  myScreen.fill(0,0,0);
+  myScreen.setTextSize(1);
+  myScreen.rect(110,98,30,10);
+  myScreen.stroke(0,191,255);
+  myScreen.text(RrelayTempPrintout,110,98);
+}
+
+
 
 
 double getTemperature(){
@@ -141,6 +176,40 @@ double getTemperature(){
   double out = sensors.getTempCByIndex(0);
   return out;
 }
+
+void getRelayTemp(){
+  String data = Serial.readString();
+  if ((data != "") && (data[0] == 'R'))
+    if (data[1] = '+'){
+      char arr[] = {data[2],data[3],data[4],data[5]};
+      Serial.println(arr);
+      String temp(arr);
+      if (temp.toDouble() != tankRRelayTemp){
+        tankRRelayTemp = temp.toDouble();
+        updtaeRelayTempR();
+      }
+      Serial.println(tankRRelayTemp);
+    
+    }
+
+   if ((data != "") && (data[0] == 'L'))
+    if (data[1] = '+'){
+      char arr[] = {data[2],data[3],data[4],data[5]};
+      Serial.println(arr);
+      String temp(arr);
+      if (temp.toDouble() != tankLRelayTemp){
+        tankLRelayTemp = temp.toDouble();
+        updtaeRelayTempL();
+      }
+      Serial.println(tankLRelayTemp);
+    
+    }
+      
+//      tankRRelayTemp = double(data[2]+data[3]+data[4]);
+
+  
+}
+
 
 void setup() {
 
@@ -170,15 +239,24 @@ drawRightTank();
   // start serial port
  
   Serial.begin(9600);
+  updtaeRelayTempR();
+  updtaeRelayTempL();
 }
 
 void loop() { 
+
+  getRelayTemp();
+  
   double temp = getTemperature();
   
-  if (temp > 20)
+  if (temp > tankLRelayTemp)
     setRellayL(true);
+  else
+    setRellayL(false);
 
-  if (temp > 20)
+  if (temp > tankRRelayTemp)
+    setRellayR(true); 
+  else
     setRellayR(false); 
   
   if (!tempString.equals(String(temp,5))){
