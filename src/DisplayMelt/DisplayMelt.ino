@@ -26,7 +26,15 @@ void setup()
 
 
 float getVoltage(uint8_t pin){
-  int v_points = analogRead(pin); 
+  int times = 10;
+  double sumpoints = 0;
+  for (int i =0; i<times; i++){
+    sumpoints+=analogRead(pin);
+    delay(10);
+    Serial.print("points");
+    Serial.println(sumpoints);
+  }
+  int v_points = sumpoints/times; 
   float voltage =  (v_points * 5);
 
 voltage = voltage/1023;
@@ -43,6 +51,8 @@ float getResistance(float v_x, float r_known, float v_total){
   
   return r_x;
 }
+
+
 
 
 float getTermoT(float R_zero, float r_term){
@@ -114,9 +124,12 @@ float getResistance3(float vout, float r, float vcc){
  
 void loop()
 {
-voltage = getVoltage(A3);
+voltage = getVoltage(A1);
+double voltage2 = getVoltage(A5);
+Serial.print("VoltageA5 ");
+Serial.println(voltage2);
 resistance = getResistance3(voltage, 110, 3.3);
-resistance = resistance;
+resistance = resistance-0.69;
 //resistance = getResistance2();
 
 temperature = getTermoT(100, resistance);

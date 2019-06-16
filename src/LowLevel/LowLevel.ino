@@ -25,8 +25,11 @@ TFT myScreen = TFT(CS, DC, RESET);
 // variable to keep track of the elapsed time
 int counter = 0;
 
-double temp;
-String tempString;
+double tempL;
+float tempR;
+
+String tempStringL;
+String tempStringR;
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
@@ -177,31 +180,91 @@ double getTemperature(){
   return out;
 }
 
+float getVoltage(uint8_t pin){
+  int times = 10;
+  double sumpoints = 0;
+  for (int i =0; i<times; i++){
+    sumpoints+=analogRead(pin);
+    delay(10);
+  }
+  int v_points = sumpoints/times; 
+  float voltage =  (v_points * 5);
+
+voltage = voltage/1023;
+  return voltage;
+}
+
+
+float getResistance(float vout, float r, float vcc){
+  float Rx = r*vcc;
+
+  Rx = Rx/vout;
+
+  Rx = Rx - r;
+  
+  return Rx;
+}
+
+float getTermoT(float R_zero, float r_term){
+float up = 0;
+float down = 0;
+float temp = -273.0;
+//  double alfa = 3.9083 * pow(10,  -3);
+  float alfa = 3.9083 * pow(10,  -3);
+  float beta= -5.7750 * pow(10, -7);
+//   double beta=  * pow(10, -7);
+    
+  up = (-R_zero * alfa) + sqrt(pow(R_zero, 2)* pow(alfa, 2) - 4* R_zero * beta * (R_zero - r_term));
+//  up = (-R_zero * alfa) + sqrt(pow(R_zero, 2)* pow(alfa, 2) - 4* R_zero * beta * (R_zero - r_term));
+  down = 2 * R_zero * beta;
+  
+  temp = up/down;
+  
+//  temp = -100 * a + sqrt(pow (100, 2) * pow(a, 2) - 4*100*b*(100 - r)) / 2 * 100 * b;
+  return temp;
+  
+}
+
+float getTemperatureResistance(){
+  {
+float voltage = getVoltage(A1);
+double voltage2 = getVoltage(A5);
+//Serial.print("VoltageA5 ");
+//Serial.println(voltage2);
+float resistance = getResistance(voltage, 110, 3.3);
+resistance = resistance-0.69;
+//resistance = getResistance2();
+
+return getTermoT(100, resistance);
+}
+}
+
+
 void getRelayTemp(){
   String data = Serial.readString();
   if ((data != "") && (data[0] == 'R'))
     if (data[1] = '+'){
       char arr[] = {data[2],data[3],data[4],data[5]};
-      Serial.println(arr);
+//      Serial.println(arr);
       String temp(arr);
       if (temp.toDouble() != tankRRelayTemp){
         tankRRelayTemp = temp.toDouble();
         updtaeRelayTempR();
       }
-      Serial.println(tankRRelayTemp);
+//      Serial.println(tankRRelayTemp);
     
     }
 
    if ((data != "") && (data[0] == 'L'))
     if (data[1] = '+'){
       char arr[] = {data[2],data[3],data[4],data[5]};
-      Serial.println(arr);
+//      Serial.println(arr);
       String temp(arr);
       if (temp.toDouble() != tankLRelayTemp){
         tankLRelayTemp = temp.toDouble();
         updtaeRelayTempL();
       }
-      Serial.println(tankLRelayTemp);
+//      Serial.println(tankLRelayTemp);
     
     }
       
@@ -217,7 +280,8 @@ pinMode(RELAY1, OUTPUT);
 pinMode(RELAY2, OUTPUT);
 
 sensors.begin();
-temp = -99;
+tempL = -99;
+tempR = -99;
 
   // put your setup code here, to run once:
 myScreen.begin();  
@@ -247,22 +311,30 @@ void loop() {
 
   getRelayTemp();
   
-  double temp = getTemperature();
   
-  if (temp > tankLRelayTemp)
+  tempL = getTemperature();
+  tempR = getTemperatureResistance();
+  
+  if (tempL > tankLRelayTemp)
     setRellayL(true);
   else
     setRellayL(false);
 
-  if (temp > tankRRelayTemp)
+  if (tempR > tankRRelayTemp)
     setRellayR(true); 
   else
     setRellayR(false); 
   
-  if (!tempString.equals(String(temp,5))){
-      tempString = String(temp,5);
-      SetTemperatureL(tempString);
-      SetTemperatureR(tempString);
+  if (!tempStringL.equals(String(tempL,5))){
+      tempStringL = String(tempL,5);
+      SetTemperatureL(tempStringL);
+//      SetTemperatureR(tempStringR);
+    }
+
+    if (!tempStringR.equals(String(tempR,5))){
+      tempStringR = String(tempR,5);
+//      SetTemperatureL(tempStringL);
+      SetTemperatureR(tempStringR);
     }
   
 //  SetTemperature("right", "test");
