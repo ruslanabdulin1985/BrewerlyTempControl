@@ -195,8 +195,30 @@ voltage = voltage/1023;
 }
 
 
+float getResistance2(float vout, float r, float vcc){
+  int Vin=5;        // напряжение на выводе 5V arduino
+float Vout=0;     // напряжение на выводе A0 arduino
+float R1=109.2;    // значение известного сопротивления
+float R2=0;       // значение неизвестного сопротивления
+
+int a2d_data=0;    
+float buffer=0;            
+
+a2d_data=analogRead(A1);
+if(a2d_data)
+{
+  buffer=a2d_data*Vin;
+  Vout=(buffer)/1024.0;
+  buffer=Vout/(Vin-Vout); 
+  R2=R1*buffer;
+}
+return R2;
+}
+
 float getResistance(float vout, float r, float vcc){
   float Rx = r*vcc;
+//  Serial.print("Rx");
+//  Serial.print(Rx);
 
   Rx = Rx/vout;
 
@@ -227,12 +249,14 @@ float temp = -273.0;
 
 float getTemperatureResistance(){
   {
-float voltage = getVoltage(A1);
-double voltage2 = getVoltage(A5);
-//Serial.print("VoltageA5 ");
-//Serial.println(voltage2);
-float resistance = getResistance(voltage, 110, 3.3);
-resistance = resistance-0.69;
+float voltage = getVoltage(A2);
+//double voltage2 = getVoltage(A5);
+Serial.print("VoltageA5 ");
+Serial.println(voltage);
+float resistance = getResistance2(voltage, 109.2, 5);
+Serial.println(resistance);
+//resistance = resistance-1.69;
+
 //resistance = getResistance2();
 
 return getTermoT(100, resistance);
