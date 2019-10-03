@@ -348,16 +348,18 @@ drawRightTank();
   
 }
 
-void TempToSerial(){
+float getTempMAX31865R(){
   
   uint16_t rtd = max.readRTD();
 
-  Serial.print("RTD value: "); Serial.println(rtd);
+  //Serial.print("RTD value: "); Serial.println(rtd);
   float ratio = rtd;
   ratio /= 32768;
-  Serial.print("Ratio = "); Serial.println(ratio,8);
-  Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
-  Serial.print("Temperature = "); Serial.println(max.temperature(RNOMINAL, RREF));
+  //Serial.print("Ratio = "); Serial.println(ratio,8);
+  //Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
+  //Serial.print("Temperature = "); Serial.println(max.temperature(RNOMINAL, RREF));
+
+ 
 
   // Check and print any faults
   uint8_t fault = max.readFault();
@@ -383,7 +385,8 @@ void TempToSerial(){
     }
     max.clearFault();
   }
-  Serial.println();
+  //Serial.println();
+  return max.temperature(RNOMINAL, RREF);
 }
 
 void loop() { 
@@ -392,7 +395,7 @@ void loop() {
   
   
   tempL = getTemperature();
-  tempR = getTemperatureResistance();
+  tempR = getTempMAX31865R();
   
   if (tempL > tankLRelayTemp)
     setRellayL(true);
@@ -417,7 +420,7 @@ void loop() {
     }
   
 //  SetTemperature("right", "test");
-  TempToSerial();
+//  TempToSerial();
   delay(1000);  // pause 
   
 }
