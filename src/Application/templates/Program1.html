@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Program1</title>
+
+</head>
+<body>
+<h1> Periods :</h1>
+{%for period in periods%}
+
+    <h3> ### </h3>
+    <h3> Name : {{period.name}} </h3>
+    <h3> Duration : {{period.time}} </h3>
+    <h3> Temperature : {{period.temp}} </h3>
+    {%if False%}
+    <h4>Extra</h4>
+    {%endif%}
+<br>
+{%endfor%}
+
+</body>
+</html>

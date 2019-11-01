@@ -1,11 +1,17 @@
 from flask import Flask, render_template
+from programs import Program1
+
 
 app = Flask(__name__)
 
 @app.route("/")
 def hello():
+
     return render_template('index.html')
-    buttonText = "bttest"
+
+@app.route("/program1")
+def prgr1():
+    return render_template('Program1.html', periods = Program1.periods)
 
 if __name__ == "__main__":
     app.run(debug=True)
