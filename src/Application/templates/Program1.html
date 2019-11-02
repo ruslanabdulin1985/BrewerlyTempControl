@@ -13,8 +13,8 @@
     <h3> Name : {{period.name}} </h3>
     <h3> Duration : {{period.time}} </h3>
     <h3> Temperature : {{period.temp}} </h3>
-    {%if False%}
-    <h4>Extra</h4>
+    {%if period.name=="intro"%}
+    <h4>{{datetime.now()}}</h4>
     {%endif%}
 <br>
 {%endfor%}
