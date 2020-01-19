@@ -4,6 +4,8 @@ import threading
 import atexit
 import datetime
 
+import conf
+
 
 class Interface:
     def __init__(self, master):
@@ -17,14 +19,18 @@ class Interface:
         
 
         
-        button2 = Button(topFrame, text="Program2", fg='green', command=actions.program2) 
-        button4 = Button(topFrame, text="Program3", fg='green')
+        button2 = Button(topFrame, text="Program1", fg='green', command=actions.program1) 
+        button4 = Button(topFrame, text="Program1", fg='green')
 
         topFrame.pack(side=TOP)
         thelablel.pack()
         button1.pack()
         button2.pack()
         button4.pack()
+
+    def on_closing():
+        actions.isStarted = False
+        root.destroy()
 
 class program:
     def __init__(self, totalTime, periods):
@@ -35,7 +41,10 @@ class period:
     def __init__(self, time, temp):
         self.time = time
         self.temp = temp
-
+    
+    def toString(self):
+        print("time="+str(self.time)+", temp="+str(self.temp))
+       
 
 class actions:
     isStarted = False
@@ -57,53 +66,30 @@ class actions:
 
     def runProgram1():
         while actions.isStarted is True:
-            runningProgram = program(10, [period(5,22), period(5,32)])   
+            data = conf.conf.readFile("program1.conf")
+            periods = []
+            for p in data:
+                periods.append(period(int(p[1]), int(p[2])))
+
+            for p in periods:
+                p.toString()
+
+            runningProgram = program(20, periods)   
+
             for per in runningProgram.periods:
                 while per.time != 0 and actions.isStarted is True:
-                    print("running"+str(per.time) + " " + str(per.temp))
+                    print("running " + str(per.time) + " " + str(per.temp))
                     per.time=per.time-1
                     runningProgram.totalTime=runningProgram.totalTime-1
                     time.sleep(1)
             actions.isStarted = False
             
-            
-
-            # runningProgram.totalTime=runningProgram.totalTime-1
-            # time.sleep(1)
-
-
-
-        #time.sleep(10);
-
-    def program2():    
-        print("Program2")
-        #time.sleep(10);
-
-    def timer2(self):
-        while actions.a == 1:
-            #print(actions.a)
-            print(datetime.datetime.now())
-            time.sleep(1)
-
-    def timer(self): 
-        timer = threading.Timer(2.0, actions.timer)
-        if actions.a == 1:
-            print(actions.a)
-            timer.start()  
-
-    def doThings(self):
         
-        print("Hey")
-        time.sleep(2)
-
-    def doSomethingElse(self, a=2):
-        print("Works")
-        actions.a=2
-
 if __name__ == "__main__":
         # pass
     root = Tk()
     intterface = Interface(root)
+    root.protocol("WM_DELETE_WINDOW", Interface.on_closing)
     root.mainloop()
     
     atexit.register(actions.killthreds)
