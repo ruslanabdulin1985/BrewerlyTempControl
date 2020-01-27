@@ -3,6 +3,8 @@ import time
 import threading 
 import atexit
 import datetime
+import program
+import status
 
 import conf
 
@@ -32,22 +34,10 @@ class Interface:
         actions.isStarted = False
         root.destroy()
 
-class program:
-    def __init__(self, totalTime, periods):
-        self.totalTime = totalTime
-        self.periods = periods
-
-class period:
-    def __init__(self, time, temp):
-        self.time = time
-        self.temp = temp
-    
-    def toString(self):
-        print("time="+str(self.time)+", temp="+str(self.temp))
        
 
 class actions:
-    isStarted = False
+    
     a = 1
 
     def check(self): 
@@ -55,34 +45,14 @@ class actions:
         print(programTemp)
     
     def program1():   
-        if actions.isStarted is False:
-            actions.isStarted=True
+        if status.isStarted is False:
+            status.isStarted=True
             print("Starting")
-            threading.Thread(target=actions.runProgram1).start()
+            threading.Thread(target=program.main.runProgram("program1.conf")).start()
 
         else:
-            actions.isStarted = False
+            status.isStarted = False
             print("Stopping")
-
-    def runProgram1():
-        while actions.isStarted is True:
-            data = conf.conf.readFile("program1.conf")
-            periods = []
-            for p in data:
-                periods.append(period(int(p[1]), int(p[2])))
-
-            for p in periods:
-                p.toString()
-
-            runningProgram = program(20, periods)   
-
-            for per in runningProgram.periods:
-                while per.time != 0 and actions.isStarted is True:
-                    print("running " + str(per.time) + " " + str(per.temp))
-                    per.time=per.time-1
-                    runningProgram.totalTime=runningProgram.totalTime-1
-                    time.sleep(1)
-            actions.isStarted = False
             
         
 if __name__ == "__main__":
