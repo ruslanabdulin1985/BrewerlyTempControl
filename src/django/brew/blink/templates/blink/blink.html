@@ -1,3 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'blink/style.css' %}">
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -5,11 +9,57 @@
     <title>BLINK</title>
 </head>
 <body>
-    
+    		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="logo"><strong>Brewery Control System</strong></a>
+				<nav>
+					<a href="#menu">Menu</a>
+				</nav>
+            </header>
+  
+		<!-- Three -->
+        <article id="three" class="post style2">
+            <div class="content">
+                <header>
+                    <h2 class="align-center"><a class="left" href="generic.html">TANK 1</a></h2>
+                    <p class="info">Temperature: <a href="#">34.6°</a></p>
+                </header>
+                <div class="inner">
+                    
+                    <p> TEST </p>
+                    <ul class="actions">
+                        <li><a href="generic.html" class="button alt">Read More</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="content">
+                <header>
+                    <h2 class="align-center"><a href="generic.html">TANK 2</a></h2>
+                    <p class="info">Temperature: <a href="#">36.1°</a></p>
+                </header>
+                <div class="inner">
+                    
+                    <p>TEST</p>
+                    <ul class="actions">
+                        <li><a href="generic.html" class="button alt">Read More</a></li>
+                    </ul>
+                </div>
+                
+            </div>
+        </article>
+
+
+    <p>This text should be red</p>
 </body>
 <h1> Welcome to BLINK </h1>
-
+<a>Test</a>
+<li a>GREEN</li>
 <br>
 <br>
 Hello {{ m_string }}
+
+<form action='on' method='GET'>
+    <button type='turn_on'>Turn On</button>
+</form>
+
 </html>
